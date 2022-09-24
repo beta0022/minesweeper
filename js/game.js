@@ -21,13 +21,6 @@ const gLevel = {
 
 let minesAroundCount = 0
 
-const gBoard = {
-    minesAroundCount: 4,
-    isShown: true,
-    isMine: false,
-    isMarked: true
-}
-
 let shownCount = 0
 let markedCount = 0
 
@@ -38,7 +31,11 @@ const gGame = {
     secsPassed: 0
 }
 
-let board = []
+let gTimerInterval
+let gMilliseconds = 0
+let gSeconds = 0
+
+let gBoard;
 
 let gBoardSize = gLevel.begginer.SIZE
 
@@ -51,28 +48,32 @@ minesCount.textContent = gLevel.begginer.MINES
 function initGame() {
     console.log('Good Luck')
 
-    board = buildBoard()
+    buildBoard()
     renderBoard()
+}
+
+function createCell(){
+    return {
+        minesAroundCount: 0,
+        isShown: false,
+        isMine: false,
+        isMarked: false
+    }
 }
 
 
 function buildBoard() {
-    let board = []
+    gBoard = []
 
     for (var i = 0; i < gBoardSize; i++) {
-        board.push([])
+        gBoard[i] = []
 
         for (var j = 0; j < gBoardSize; j++) {
-            board[i][j] = {
-                minesAroundCount: 0,
-                isShown: false,
-                isMine: false,
-                isMarked: false
-            }
+            gBoard[i][j] = createCell()
         }
     }
-    console.table(board)
-    return board
+
+    console.table(gBoard)
 }
 
 
@@ -87,25 +88,126 @@ function renderBoard() {
     
             for (var j = 0; j < gBoardSize; j++) {
     
-                  strHTML += `\t<td class="cell c${i}-${j}" onmousedown="click(event, ${i}, ${j})"></td>\n`
+                  strHTML += `\t<td class="cell c${i}-${j}" oncontextmenu=cellMarked(event,${i}-${j}) onclick="cellClick( ${i}, ${j})"></td>\n`
             }
             strHTML += '</tr>\n'
         }
     
         elTable.innerHTML = strHTML
 }
-
-
-function randomLocations(gBoard) {
     
-    for (var i = 0; i < gLevel.begginer.MINES ; i++) {
 
-        let i = getRandomInt(0, gBoardSize)
-        let j = getRandomInt(0, gBoardSize)
+
+
+function cellClick(event, elCell, i, j) {
+    console.log('cellClicked () called' )
     
-        gBoard[i][j] = MINE
+    if (!gGame.isOn){
+        console.log('Game Starting!');
+        gGame.isOn = true
+        gTimerInterval = setInterval(displayTimer, 10)
+        setMinesAfterFirstClick(i,j)
+        setMinesAroundCount ()
+        console.log(gBoard);
+    } 
+    
+}
+
+function setMinesAfterFirstClick(i,j){
+    let counter = 0;
+    while(counter < gLevel.begginer.MINES) {
+        const randomI = getRandomInt(0, gLevel.begginer.SIZE)
+        const randomJ = getRandomInt(0, gLevel.begginer.SIZE)
+
+        if (randomI === i && randomJ === j) {
+            console.log('HERE');
+            continue
+        }
+
+        if (gBoard[randomI][randomJ].isMine) continue 
+
+        gBoard[randomI][randomJ].isMine = true
+        counter++
     }
-    return
+}
+
+function displayTimer() {
+    gMilliseconds += 10
+    if (gMilliseconds === 1000) {
+        gMilliseconds = 0
+        gSeconds++
+    }
+    let seconds;
+
+    if(gSeconds < 10){
+        seconds = '00' + gSeconds
+    }else{
+        if(gSeconds < 100){
+            seconds = '0' + gSeconds
+        }else{
+            seconds = gSeconds
+        }
+    }
+    
+    let elTimer = document.querySelector('.timer')
+
+    elTimer.innerText = `${seconds}`
+
+}
+
+
+function cellMarked(event, i,j){
+    console.log('right click ()');
+    event.preventDefault()
+
+    if (!gGame.isOn){
+        gGame.isOn = true
+        gTimerInterval = setInterval(displayTimer, 10)
+        setMinesAfterFirstClick(i,j)
+        setMinesAroundCount ()
+        console.log(gBoard);
+    } 
+}
+
+function setMinesAroundCount (){
+    for (let i = 0; i < gLevel.begginer.SIZE; i++) {
+
+        for (let j = 0; j < gLevel.begginer.SIZE; j++) {
+
+            const currLocation = {i,j}
+
+            const minesAroundLocation = getAllMinesAroundLocation(currLocation) // [{0,0},{4,5}]
+            console.log(minesAroundLocation);
+            gBoard[i][j].minesAroundCount = minesAroundLocation.length
+            
+        }
+        
+    }
+}
+
+
+
+function getAllMinesAroundLocation(location) {
+    const minesAroundLoc = [] 
+
+    for (let i = location.i - 1; i < location.i + 1; i++) {
+        
+        if(i < 0 || i > gLevel.begginer.SIZE - 1) continue
+
+        for (let j = location.j - 1; j < location.j + 1; j++) {
+
+            if(j < 0 || j > gLevel.begginer.SIZE - 1) continue
+
+            if(location.i === i && location.j === j) continue
+
+            if (gBoard[i][j].isShown || gBoard[i][j].isMarked) continue
+
+            if(gBoard[i][j].isMine) minesAroundLoc.push({i,j})
+            
+        }
+        
+    }
+    return minesAroundLoc
 }
 
 
@@ -113,65 +215,4 @@ function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min) + min)
-}
-
-
-function click(event, elCell, i, j) {
-
-    if (event.button === 0) cellClicked(elCell, i, j)
-    else if (event.button === 2) cellMarked(elCell)
-    //secsPassed() on
-
-}
-
-
-function cellMarked(elCell){
-
-    gBoard[i][j].isMarked = true
-
-    if (gBoard[i][j].isMine = true) gGame.markedCount++
-    checkGameOver()
-}
-
-
-// function cellClicked(elCell, i, j){
-//     if (gBoard.isMine = true) {
-//         checkGameOver() && //revealing all MINES cells
-//     }
-
-//     if (gBoard[i][j].minesAroundCount > 0) {
-//         gBoard[i][j].isShown = true
-//     } else {
-//         expandShown (i,j)
-//     }
-
-// }
-
-function neighbor () {
-   // when click on empty cell
-}
-
-// setMinesNegsCount(board){
-
-//     //Count mines around each cell and set the cell's minesAroundCount.
-// }
-
-function expandShown (){
-    //When user clicks a cell with no mines around, we need to open not only that cell, but also its neighbors. NOTE: start with a basic implementation that only opens the non-mine 1st degree neighbors.
-}
-
-function checkGameOver(){
-
-    gGame.isOn = false
-    console.log('Game Over')
-    //stop secsPassed()
-
-    //lose if gBoard[i][j].isMarked = true and revealing all MINES cells
-
-    //win if gGame.markedCount===gLevel.begginer.mines && all the cell revealed 
-}
-
-
-function secsPassed(){
-
 }
