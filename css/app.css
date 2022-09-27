@@ -35,9 +35,66 @@ body {
 
 
 .cell:hover {
-    border: 2px solid rgba(62, 63, 63, 0.218);
+    border: 2px solid rgba(255, 255, 255, 0.218);
 }
 
+
+.shown {
+    background-color: rgb(224, 224, 224);
+    border-color: #ffffff;
+}
+
+
+/* .flag {
+    background-color: rgb(61, 153, 159);
+    display: inline-block;
+}
+  
+.flag span {
+    font-size: 1.2em;
+} */
+
+
+.gLevel {
+    margin: 10px;
+}
+
+.gLevel .level {
+    background-color: rgba(255, 255, 255, 0.267);
+    width: fit-content;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    padding: 10px;
+    border-radius: 12px;
+    margin: 10px;
+    color: rgb(255, 255, 255);
+    display: flex;
+    align-items: center;
+    font-size: 0.8em;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+    display: inline-block;
+}
+
+
+.gLevel .level:hover {
+    border: 2px solid rgba(62, 63, 63, 0.218);
+    transform: translate3d(1px, 0, 0);
+    cursor: pointer;
+}
+ 
+
+.gLevel .level:focus {
+    border: 2px solid rgba(62, 63, 63, 0.218);
+    background-color: #ffffff;
+    width: fit-content;
+    padding: 10px;
+    border-radius: 12px;
+    color: rgb(61, 153, 159);
+    display: flex;
+    align-items: center;
+    font-size: 0.8em;
+    display: inline-block;
+}
+  
 
 .subtext {
     background-color: #ffffff;
@@ -69,14 +126,35 @@ body {
     display: inline-block;
 }
 
-.row{
-    display: table;
-    width: 100%; 
-    table-layout: fixed;
-    border-spacing: 10px;
-    width: fit-content;
-    padding: 10px;
-    border-radius: 12px;
-    margin: 6%;
-    color: rgb(61, 153, 159);
+
+.one {
+    color: rgb(80, 180, 159);
+}
+  
+.two {
+    color: rgb(70, 170, 159);
+  }
+  
+.three {
+    color: rgb(60, 160, 159);
+}
+  
+.four {
+    color: rgb(50, 150, 159);
+}
+  
+.five {
+    color: rgb(40, 140, 159);
+}
+  
+.six {
+    color: rgb(30, 130, 159);
+}
+  
+.seven {
+    color: rgb(20, 120, 159);
+}
+  
+.eight {
+    color: rgb(10, 110, 159);
 }
